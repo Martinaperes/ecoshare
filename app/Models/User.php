@@ -49,4 +49,20 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function organization()
+    {
+        return $this->hasOne(Organization::class);
+    }
+
+    public function foodDonations()
+    {
+        return $this->hasManyThrough(FoodDonation::class, Organization::class);
+    }
+
+    public function clothingDonations()
+    {
+        return $this->hasMany(ClothingDonation::class);
+    }
 }
+
