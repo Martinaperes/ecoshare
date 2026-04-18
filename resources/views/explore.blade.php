@@ -4,7 +4,32 @@
 
 @section('content')
 <main class="pt-24 lg:pt-32 pb-32 px-4 md:px-6 max-w-7xl mx-auto space-y-12 lg:space-y-16">
-    <!-- Search & Filter Bar: Professional & Compact -->
+    
+    <!-- Community Expansion Banner -->
+    <section class="bg-[#f2f2e9] p-8 md:p-12 rounded-[3rem] border border-outline-variant/10 relative overflow-hidden group">
+        <div class="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-8">
+            <div class="max-w-xl text-center lg:text-left space-y-4">
+                <span class="inline-block px-4 py-1.5 rounded-full bg-secondary text-on-secondary text-[10px] font-black uppercase tracking-widest">Growth Phase</span>
+                <h2 class="text-3xl md:text-5xl font-headline font-black text-primary tracking-tighter leading-none">Bring your business <br/>into the collective.</h2>
+                <p class="text-on-surface-variant font-medium opacity-70">Register as a Verified Hub to start listing surplus food professionaly or managing textile collections.</p>
+            </div>
+            @auth
+                <a href="{{ route('donate') }}" class="px-10 py-6 bg-primary text-on-primary rounded-2xl md:rounded-full font-headline font-black text-lg shadow-2xl hover:bg-secondary transition-all active:scale-95 whitespace-nowrap">
+                    Manage My Hub
+                </a>
+            @else
+                <a href="{{ route('register', ['role' => 'organization']) }}" class="px-10 py-6 bg-primary text-on-primary rounded-2xl md:rounded-full font-headline font-black text-lg shadow-2xl hover:bg-secondary transition-all active:scale-95 whitespace-nowrap">
+                    Register Your Organization
+                </a>
+            @endauth
+
+
+        </div>
+        <!-- Decoration -->
+        <span class="material-symbols-outlined absolute -right-10 -bottom-10 text-[20rem] text-primary/5 -rotate-12 pointer-events-none">groups</span>
+    </section>
+
+    <!-- Search & Filter Bar -->
     <section class="bg-surface-container-low p-4 rounded-[2rem] md:rounded-[3rem] shadow-inner border border-outline-variant/5">
         <div class="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
             <div class="relative flex-1 group">
@@ -23,20 +48,9 @@
         </div>
     </section>
 
-    <!-- Grid Layout: Premium Bento Style -->
+    <!-- Dynamic Discovery Feed -->
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
-        @php
-            $items = [
-                ['type' => 'FOOD', 'title' => 'Fresh Excess: Sopa Lodge', 'location' => 'Lower Kabete', 'time' => 'Expires in 4h', 'qty' => '50 Portions', 'color' => 'secondary', 'icon' => 'restaurant'],
-                ['type' => 'TEXTILE', 'title' => 'Linens Needed: NGO Hub', 'location' => 'Kibera Drive', 'time' => 'High Priority', 'qty' => '20 Sets', 'color' => 'primary', 'icon' => 'checkroom'],
-                ['type' => 'FOOD', 'title' => 'Bakery Surplus: Java House', 'location' => 'CBD Branch', 'time' => 'Available Now', 'qty' => '30 Packs', 'color' => 'secondary', 'icon' => 'bakery_dining'],
-                ['type' => 'LOGISTICS', 'title' => 'Pickup Agent Needed', 'location' => 'Westlands Node', 'time' => 'Route Active', 'qty' => '3 Drops', 'color' => 'tertiary', 'icon' => 'local_shipping'],
-                ['type' => 'TEXTILE', 'title' => 'Uniform Collection', 'location' => 'Industrial Area', 'time' => 'Scheduled', 'qty' => '100+ Pieces', 'color' => 'primary', 'icon' => 'apparel'],
-                ['type' => 'FOOD', 'title' => 'Event Surplus: KICC', 'location' => 'City Square', 'time' => 'Urgent', 'qty' => '500+ Meals', 'color' => 'secondary', 'icon' => 'groups'],
-            ];
-        @endphp
-
-        @foreach($items as $item)
+        @forelse($items as $item)
         <div class="group bg-white rounded-[2.5rem] md:rounded-[3rem] p-8 space-y-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border border-outline-variant/10 flex flex-col justify-between">
             <div class="space-y-6">
                 <div class="flex justify-between items-start">
@@ -70,10 +84,22 @@
                 </button>
             </div>
         </div>
-        @endforeach
+        @empty
+        <!-- Empty State for Feed -->
+        <div class="col-span-full py-32 flex flex-col items-center text-center space-y-8 max-w-lg mx-auto">
+            <div class="w-24 h-24 bg-surface-container rounded-full flex items-center justify-center text-outline/20">
+                <span class="material-symbols-outlined text-5xl">inventory_2</span>
+            </div>
+            <div class="space-y-3">
+                <h3 class="text-2xl font-headline font-black text-primary">Circulation Resting.</h3>
+                <p class="text-on-surface-variant font-medium opacity-70">The community rhythm is currently calm. No active listings are available right now. Why not initiate the cycle by donating above?</p>
+            </div>
+            <a href="{{ route('donate') }}" class="px-8 py-4 bg-secondary/10 text-secondary rounded-2xl font-black text-[10px] uppercase tracking-widest border border-secondary/5">Start the Cycle</a>
+        </div>
+        @endforelse
     </section>
 
-    <!-- Global Map Call: Premium Section -->
+    <!-- Global Map Call -->
     <section class="pb-12">
         <div class="bg-primary rounded-[3rem] md:rounded-[4rem] p-8 md:p-16 lg:p-20 text-on-primary overflow-hidden relative shadow-2xl">
             <div class="relative z-10 max-w-2xl text-center lg:text-left mx-auto lg:mx-0">
@@ -84,7 +110,7 @@
                         <div class="flex -space-x-5">
                             @foreach([1,2,3] as $i)
                             <div class="w-12 h-12 rounded-full border-4 border-primary bg-surface-container-highest overflow-hidden shadow-lg">
-                                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYmdjL1dTaK0m-2XT3dKLi2iAtjjz_ZkeAxgRUomRKfcdDjGtyiB3pB73G89HthVbyzlDNL01186La8eUCj2S7bWkgJdQasXLwjglJia9bhlU3P04gGedB4LRFIs5IiFGY751-L7vpv5JD-dZkn9THrmRcWNwXBszxMQI84YEUPBFDSv1sGJ2O4EAvp9pkzs9dDgX0-DC4D9ShkG_5Dg__ORHQRAaHVf3YcrRIlC41iQ8fUdtbNVcTlRejEhU-PNXFeR6TaSyHx60" class="w-full h-full object-cover">
+                                <div class="w-full h-full bg-white/20"></div>
                             </div>
                             @endforeach
                         </div>
@@ -92,10 +118,7 @@
                     </div>
                 </div>
             </div>
-            <!-- Topography decoration -->
-            <div class="absolute inset-0 opacity-10 pointer-events-none">
-                <div class="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_30%,_rgba(255,255,255,0.2),_transparent)]"></div>
-            </div>
+            <div class="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/asfalt-light.png')]"></div>
         </div>
     </section>
 </main>
