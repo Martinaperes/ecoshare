@@ -130,12 +130,68 @@
             <span class="material-symbols-outlined mb-1" style="{{ request()->is('explore') ? 'font-variation-settings: \'FILL\' 1;' : '' }}">explore</span>
             <span class="text-[10px] font-bold uppercase tracking-widest">Explore</span>
         </a>
-        <a href="{{ url('/impact') }}" class="flex flex-col items-center justify-center {{ request()->is('impact') ? 'text-primary bg-primary-fixed' : 'text-on-surface-variant hover:text-primary' }} rounded-2xl px-6 py-2 transition-all duration-300">
-            <span class="material-symbols-outlined mb-1" style="{{ request()->is('impact') ? 'font-variation-settings: \'FILL\' 1;' : '' }}">monitoring</span>
+        <a href="{{ route('impact') }}" class="flex flex-col items-center justify-center {{ request()->routeIs('impact') ? 'text-primary bg-primary-fixed' : 'text-on-surface-variant hover:text-primary' }} rounded-2xl px-6 py-2 transition-all duration-300">
+            <span class="material-symbols-outlined mb-1" style="{{ request()->routeIs('impact') ? 'font-variation-settings: \'FILL\' 1;' : '' }}">monitoring</span>
             <span class="text-[10px] font-bold uppercase tracking-widest">Impact</span>
         </a>
+        <a href="{{ route('about') }}" class="flex flex-col items-center justify-center {{ request()->routeIs('about') ? 'text-primary bg-primary-fixed' : 'text-on-surface-variant hover:text-primary' }} rounded-2xl px-6 py-2 transition-all duration-300">
+            <span class="material-symbols-outlined mb-1" style="{{ request()->routeIs('about') ? 'font-variation-settings: \'FILL\' 1;' : '' }}">auto_awesome</span>
+            <span class="text-[10px] font-bold uppercase tracking-widest">Mission</span>
+        </a>
     </nav>
+
+    <!-- Premium Footer Area -->
+    <footer class="bg-primary pt-24 pb-48 px-6 text-on-primary rounded-t-[5rem] mt-24">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-16">
+            <div class="md:col-span-5 space-y-8">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center border border-white/10">
+                        <span class="material-symbols-outlined text-white">eco</span>
+                    </div>
+                    <span class="text-3xl font-black tracking-tighter font-headline">EcoShare</span>
+                </div>
+                <p class="text-on-primary/70 text-lg leading-relaxed max-w-sm">A Nairobi-based circular network connecting abundance to necessity with dignity and professional logistics.</p>
+                <div class="flex gap-4">
+                    <div class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all cursor-pointer">
+                        <span class="material-symbols-outlined text-sm">public</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all cursor-pointer">
+                        <span class="material-symbols-outlined text-sm">alternate_email</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="md:col-span-3 space-y-6">
+                <h4 class="text-xs font-black uppercase tracking-[0.3em] text-white/40">The Collective</h4>
+                <ul class="space-y-4 font-bold text-sm">
+                    <li><a href="{{ route('explore') }}" class="hover:text-secondary-fixed transition-colors">Find Local Hubs</a></li>
+                    <li><a href="{{ route('register') }}" class="hover:text-secondary-fixed transition-colors">Register Organization</a></li>
+                    <li><a href="{{ route('impact') }}" class="hover:text-secondary-fixed transition-colors">Circulation Data</a></li>
+                    <li><a href="{{ route('about') }}" class="hover:text-secondary-fixed transition-colors">Our Manifesto</a></li>
+                </ul>
+            </div>
+            
+            <div class="md:col-span-4 space-y-8">
+                <div class="p-8 bg-white/5 rounded-[2.5rem] border border-white/10 backdrop-blur-sm">
+                    <h4 class="text-xl font-headline font-black mb-4 leading-tight">Join the Pulse</h4>
+                    <p class="text-xs text-on-primary/60 mb-6 leading-relaxed">Weekly insights into Nairobi's redistribution rhythm directly in your inbox.</p>
+                    <form action="{{ route('newsletter.subscribe') }}" method="POST" class="flex gap-2">
+                        @csrf
+                        <input name="email" type="email" placeholder="Email Address" class="flex-1 bg-white/10 border-0 rounded-xl px-4 py-3 text-xs font-bold focus:ring-2 focus:ring-white/20 transition-all outline-none"/>
+                        <button type="submit" class="w-12 h-12 bg-white text-primary rounded-xl flex items-center justify-center hover:scale-105 transition-all shadow-xl">
+                            <span class="material-symbols-outlined">send</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto pt-16 mt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+            <p class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20">© 2026 EcoShare Nairobi</p>
+            <p class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20">Built with Dignity for the Community</p>
+        </div>
+    </footer>
 
     @yield('scripts')
 </body>
 </html>
+
