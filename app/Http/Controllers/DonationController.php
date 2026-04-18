@@ -67,6 +67,23 @@ class DonationController extends Controller
         ]);
     }
 
+    public function storeOrganization(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'type' => 'required|string',
+            'location' => 'required|string',
+        ]);
+
+        Auth::user()->organization()->create([
+            'name' => $request->name,
+            'type' => $request->type,
+            'location' => $request->location,
+        ]);
+
+        return redirect()->route('donate')->with('success', 'Your Community Hub is now live!');
+    }
+
     public function storeFood(Request $request)
     {
         $request->validate([
@@ -76,13 +93,11 @@ class DonationController extends Controller
         ]);
 
         $user = Auth::user();
+        $org = $user->organization;
         
-        // Ensure user has an organization (for demo purposes we create if missing)
-        $org = $user->organization ?? $user->organization()->create([
-            'name' => $user->name . "'s Hub",
-            'type' => 'restaurant',
-            'location' => $request->location ?? 'Nairobi CBD',
-        ]);
+        if (!$org) {
+            return redirect()->route('donate')->with('error', 'Please register your Hub before donating food.');
+        }
 
         $org->foodDonations()->create([
             'title' => $request->title,
@@ -93,6 +108,7 @@ class DonationController extends Controller
 
         return redirect()->route('donate')->with('success', 'Food surplus committed to the community flow!');
     }
+
 
     public function storeClothing(Request $request)
     {
