@@ -3,7 +3,7 @@
 @section('title', 'Donor Dashboard')
 
 @section('content')
-<main x-data="{ activeForm: 'food' }" class="pt-28 pb-32 px-4 md:px-6 max-w-7xl mx-auto space-y-16 lg:space-y-24">
+<main x-data="{ activeForm: '{{ Auth::user()->organization ? 'food' : 'cloth' }}', showHubForm: false }" class="pt-28 pb-32 px-4 md:px-6 max-w-7xl mx-auto space-y-16 lg:space-y-24">
     <!-- Premium Header: Personal Impact -->
     <section class="relative">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
@@ -54,6 +54,57 @@
         </div>
     </section>
 
+    <!-- Hub Registration Banner for Guests/Individuals -->
+    @if(!Auth::user()->organization)
+    <section x-show="!showHubForm" x-transition class="bg-primary/5 p-8 md:p-12 rounded-[3.5rem] border border-primary/10 flex flex-col lg:flex-row justify-between items-center gap-8 shadow-inner">
+        <div class="max-w-xl text-center lg:text-left space-y-4">
+            <h2 class="text-3xl md:text-4xl font-headline font-black text-primary tracking-tighter">Your Hub is missing.</h2>
+            <p class="text-on-surface-variant font-medium opacity-70 leading-relaxed">Food listings require a verified Community Hub or Restaurant profile. Upgrade your individual account now to start sharing fresh surplus.</p>
+        </div>
+        <button @click="showHubForm = true" class="px-10 py-6 bg-primary text-white rounded-2xl md:rounded-full font-headline font-black text-xl hover:shadow-2xl transition-all active:scale-95 shadow-xl shadow-primary/20">
+            Register My Hub
+        </button>
+    </section>
+
+    <!-- Hub Registration Mini-Form -->
+    <section x-show="showHubForm" x-transition class="bg-surface-container-high p-8 md:p-12 lg:p-16 rounded-[3.5rem] border border-outline-variant/20 shadow-2xl">
+        <div class="max-w-2xl mx-auto space-y-10">
+            <div class="text-center space-y-3">
+                <h3 class="text-3xl font-headline font-black text-primary tracking-tight">Hub Identity Protocol</h3>
+                <p class="text-on-surface-variant font-medium opacity-70">Tell us about your organization to unlock food redistribution.</p>
+            </div>
+            <form action="{{ route('organization.store') }}" method="POST" class="space-y-6">
+                @csrf
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant ml-4 opacity-60">Business / Hub Name</label>
+                        <input name="name" required class="w-full bg-white border-0 rounded-2xl px-8 py-5 font-bold text-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none shadow-sm" placeholder="e.g. Westlands Community Kitchen"/>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant ml-4 opacity-60">Entity Type</label>
+                            <select name="type" required class="w-full bg-white border-0 rounded-2xl px-8 py-5 font-bold text-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none shadow-sm appearance-none">
+                                <option value="restaurant">Restaurant / Eatery</option>
+                                <option value="ngo">NGO / Community Kitchen</option>
+                                <option value="logistics">Logistics / Sorting Hub</option>
+                                <option value="retail">Supermarket / Retail</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant ml-4 opacity-60">Primary Node (Location)</label>
+                            <input name="location" required class="w-full bg-white border-0 rounded-2xl px-8 py-5 font-bold text-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none shadow-sm" placeholder="e.g. Westlands, Nairobi"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <button type="button" @click="showHubForm = false" class="flex-1 py-6 bg-white rounded-2xl font-black text-[10px] uppercase tracking-widest text-primary border border-outline-variant/10">Cancel</button>
+                    <button type="submit" class="flex-[2] py-6 bg-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary/20">Establish Hub</button>
+                </div>
+            </form>
+        </div>
+    </section>
+    @endif
+
     <!-- Donation Listing Station -->
     <section class="grid grid-cols-1 xl:grid-cols-12 gap-8 lg:gap-10">
         <!-- Main Form Hub -->
@@ -84,50 +135,70 @@
                 </div>
             </div>
 
-            <!-- Success Message -->
+            <!-- Success/Error Messages -->
             @if(session('success'))
                 <div class="mb-12 p-6 bg-primary-fixed/50 text-primary font-black rounded-3xl border border-primary/10 shadow-xl flex items-center gap-4 animate-fade-in">
                     <span class="material-symbols-outlined">verified</span>
                     {{ session('success') }}
                 </div>
             @endif
+            @if(session('error'))
+                <div class="mb-12 p-6 bg-error/10 text-error font-black rounded-3xl border border-error/10 shadow-xl flex items-center gap-4 animate-fade-in">
+                    <span class="material-symbols-outlined">error</span>
+                    {{ session('error') }}
+                </div>
+            @endif
 
-            <!-- Food Form -->
-            <form action="{{ route('donations.food.store') }}" method="POST" x-show="activeForm === 'food'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" class="space-y-8 md:space-y-12">
-                @csrf
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 text-left">
-                    <div class="space-y-8">
-                        <div class="space-y-3">
-                            <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant ml-4 opacity-60">Meal Title</label>
-                            <input name="title" required class="w-full bg-white border-0 rounded-2xl md:rounded-3xl px-6 py-5 md:px-8 md:py-6 font-bold text-primary focus:ring-4 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-outline/30 text-sm md:text-base" placeholder="e.g. 15 Spicy Wings Meals"/>
+            <!-- Food Form (Requires Hub) -->
+            <div x-show="activeForm === 'food'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4">
+                @if(Auth::user()->organization)
+                <form action="{{ route('donations.food.store') }}" method="POST" class="space-y-8 md:space-y-12">
+                    @csrf
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 text-left">
+                        <div class="space-y-8">
+                            <div class="space-y-3">
+                                <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant ml-4 opacity-60">Meal Title</label>
+                                <input name="title" required class="w-full bg-white border-0 rounded-2xl md:rounded-3xl px-6 py-5 md:px-8 md:py-6 font-bold text-primary focus:ring-4 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-outline/30 text-sm md:text-base" placeholder="e.g. 15 Spicy Wings Meals"/>
+                            </div>
+                            <div class="space-y-3">
+                                <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant ml-4 opacity-60">Portion Quantity</label>
+                                <input name="quantity" required class="w-full bg-white border-0 rounded-2xl md:rounded-3xl px-6 py-5 md:px-8 md:py-6 font-bold text-primary focus:ring-4 focus:ring-primary/10 transition-all shadow-sm outline-none text-sm md:text-base" placeholder="e.g. 15 Packs"/>
+                            </div>
                         </div>
-                        <div class="space-y-3">
-                            <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant ml-4 opacity-60">Portion Quantity</label>
-                            <input name="quantity" required class="w-full bg-white border-0 rounded-2xl md:rounded-3xl px-6 py-5 md:px-8 md:py-6 font-bold text-primary focus:ring-4 focus:ring-primary/10 transition-all shadow-sm outline-none text-sm md:text-base" placeholder="e.g. 15 Packs"/>
-                        </div>
-                    </div>
-                    <div class="space-y-8">
-                        <div class="space-y-3">
-                            <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant ml-4 opacity-60">Best Before</label>
-                            <input name="expiry_time" required type="datetime-local" class="w-full bg-white border-0 rounded-2xl md:rounded-3xl px-6 py-5 md:px-8 md:py-6 font-bold text-primary focus:ring-4 focus:ring-primary/10 transition-all shadow-sm outline-none text-sm md:text-base"/>
-                        </div>
-                        <div class="space-y-3">
-                            <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant ml-4 opacity-60">Branch / Node</label>
-                            <div class="relative">
-                                <input name="location" class="w-full bg-white border-0 rounded-2xl md:rounded-3xl pl-16 pr-8 py-5 md:py-6 font-bold text-primary focus:ring-4 focus:ring-primary/10 transition-all shadow-sm outline-none text-sm md:text-base" value="Nairobi CBD Hub"/>
-                                <span class="material-symbols-outlined absolute left-6 top-1/2 -translate-y-1/2 text-primary opacity-40">location_on</span>
+                        <div class="space-y-8">
+                            <div class="space-y-3">
+                                <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant ml-4 opacity-60">Best Before</label>
+                                <input name="expiry_time" required type="datetime-local" class="w-full bg-white border-0 rounded-2xl md:rounded-3xl px-6 py-5 md:px-8 md:py-6 font-bold text-primary focus:ring-4 focus:ring-primary/10 transition-all shadow-sm outline-none text-sm md:text-base"/>
+                            </div>
+                            <div class="space-y-3">
+                                <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant ml-4 opacity-60">Listing Branch</label>
+                                <div class="relative">
+                                    <input readonly class="w-full bg-surface-container rounded-2xl md:rounded-3xl pl-16 pr-8 py-5 md:py-6 font-bold text-primary/50 outline-none text-sm md:text-base cursor-not-allowed" value="{{ Auth::user()->organization->name }}"/>
+                                    <span class="material-symbols-outlined absolute left-6 top-1/2 -translate-y-1/2 text-primary opacity-40">business</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="pt-6">
-                    <button type="submit" class="w-full bg-secondary text-white font-headline font-black py-6 md:py-8 rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-center gap-4 text-lg md:text-xl shadow-2xl shadow-secondary/20 hover:shadow-secondary/40 active:scale-[0.98] transition-all">
-                        Commit Food Surplus
-                        <span class="material-symbols-outlined font-black">arrow_right_alt</span>
-                    </button>
+                    <div class="pt-6">
+                        <button type="submit" class="w-full bg-secondary text-white font-headline font-black py-6 md:py-8 rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-center gap-4 text-lg md:text-xl shadow-2xl shadow-secondary/20 hover:shadow-secondary/40 active:scale-[0.98] transition-all">
+                            Commit Food Surplus
+                            <span class="material-symbols-outlined font-black">arrow_right_alt</span>
+                        </button>
+                    </div>
+                </form>
+                @else
+                <div class="py-12 flex flex-col items-center text-center space-y-6">
+                    <div class="w-20 h-20 bg-secondary/5 rounded-full flex items-center justify-center text-secondary">
+                        <span class="material-symbols-outlined text-4xl">lock</span>
+                    </div>
+                    <div class="space-y-2">
+                        <h3 class="text-2xl font-headline font-black text-primary">Food Listings Locked</h3>
+                        <p class="text-on-surface-variant font-medium opacity-70 max-w-sm">Please establish your Community Hub using the banner above to unlock restaurant surplus features.</p>
+                    </div>
                 </div>
-            </form>
+                @endif
+            </div>
 
             <!-- Clothing Form -->
             <form action="{{ route('donations.clothing.store') }}" method="POST" x-show="activeForm === 'cloth'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" class="space-y-8 md:space-y-12">
