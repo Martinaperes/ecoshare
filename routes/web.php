@@ -23,6 +23,9 @@ Route::get('/explore', function () {
 });
 
 Route::get('/donate', [\App\Http\Controllers\DonationController::class, 'index'])->middleware('auth')->name('donate');
+Route::post('/donate/food', [\App\Http\Controllers\DonationController::class, 'storeFood'])->middleware('auth')->name('donations.food.store');
+Route::post('/donate/clothing', [\App\Http\Controllers\DonationController::class, 'storeClothing'])->middleware('auth')->name('donations.clothing.store');
+
 
 
 Route::get('/impact', function () {
