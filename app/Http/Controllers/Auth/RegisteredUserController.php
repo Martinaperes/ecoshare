@@ -34,7 +34,8 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'phone' => ['required', 'string', 'max:20'],
-            'role' => ['required', 'in:donor,ngo,volunteer'],
+            'role' => ['required', 'in:individual,organization'],
+            'organization_name' => ['required_if:role,organization', 'nullable', 'string', 'max:255'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -46,10 +47,18 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        if ($user->role === 'organization' && $request->filled('organization_name')) {
+            $user->organization()->create([
+                'name' => $request->organization_name,
+                'type' => 'hub',
+                'location' => 'Nairobi Node', // Default placeholder
+            ]);
+        }
 
         event(new Registered($user));
 
         Auth::login($user);
+
 
         if ($user->role === 'admin') {
             return redirect(url('/admin'));
